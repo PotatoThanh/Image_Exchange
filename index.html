@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Hello world</title>
+</head>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    var socket = io();
+    function upload(files) {
+        socket.emit("upload", files[0], (status) => {
+            console.log(status);
+        });
+    }
+</script>
+
+<body>
+    <input type="file" onchange="upload(this.files)" />
+</body>
+
+</html>
