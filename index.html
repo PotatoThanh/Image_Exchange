@@ -1,21 +1,28 @@
 <!DOCTYPE html>
 <html>
-
-<head>
+  <head>
     <title>Hello world</title>
-</head>
-<script src="/socket.io/socket.io.js"></script>
-<script>
-    var socket = io();
-    function upload(files) {
-        socket.emit("upload", files[0], (status) => {
-            console.log(status);
-        });
-    }
-</script>
+  </head>
+  <script src="/socket.io/socket.io.js"></script>
+  
+  <body>
+    <input type="file" id="fileInput" />
+  </body>
 
-<body>
-    <input type="file" onchange="upload(this.files)" />
-</body>
+  <script>
+    var socket = io();
+    const fileInput = document.getElementById('fileInput');
+    fileInput.addEventListener("change", (event) => {
+      const file = event.target.files[0];
+      const filename = file.name;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const fileData = e.target.result;
+        socket.emit("upload", { file: fileData, filename: filename });
+      };
+      reader.readAsArrayBuffer(file);
+    });
+  </script>
 
 </html>

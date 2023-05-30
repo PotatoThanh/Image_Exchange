@@ -16,10 +16,10 @@ app.get('/', function (req, res) {
 io.on('connection', function (socket) {
     console.log('A user connected', socket.id);
     socket.on("upload", (file, callback) => {
-        console.log(file); // <Buffer 25 50 44 ...>
+        const filename = file.filename;
 
         // save the content to the disk, for example
-        fs.writeFile(__dirname+'/upload/', file, (err) => {
+        fs.writeFile(`./upload/${filename}`, file.file, (err) => {
             console.log(err);
         });
     });
