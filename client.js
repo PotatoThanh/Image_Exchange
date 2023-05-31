@@ -52,7 +52,7 @@ const intervalId = setInterval(() => {
         };
         
     }
-}, 4000);
+}, 1000);
 
 // Handle client disconnection
 socket.on('disconnect', () => {

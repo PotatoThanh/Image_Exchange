@@ -34,6 +34,13 @@ io.on('connection', (socket) => {
 
     });
 
+    const sendPrediction = 'sendPrediction';
+    const receivePrediction = 'receivePrediction';
+    socket.on(sendPrediction, (data) => {
+        console.log(data)
+        //Send predictions
+        io.sockets.emit(receivePrediction, data);
+    });
 
     // Periodically emit an event to the client every 4 seconds
     var sent = []
@@ -53,11 +60,11 @@ io.on('connection', (socket) => {
         }
 
 
-    }, 4000);
+    }, 1000);
 
     // Handle client disconnection
     socket.on('disconnect', () => {
-        console.log('A client disconnected.');
+        console.log('A client disconnected.', socket.id);
         // Stop the periodic emission when the client disconnects
         clearInterval(intervalId);
     });

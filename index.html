@@ -7,18 +7,90 @@
 <script src="/socket.io/socket.io.js"></script>
 
 <body>
-  <h1>Select a Folder</h1>
-  <input type="file" id="fileInput" webkitdirectory directory multiple />
+  <h1>Select a File</h1>
+  <input type="file" id="fileInputFile" />
   <button onclick="uploadFile()">Upload</button>
+  
+  <h1>Select Multiple Files</h1>
+  <input type="file" id="fileInputFiles" multiple />
+  <button onclick="uploadFiles()">Upload</button>
+  
+  <h1>Select a Folder</h1>
+  <input type="file" id="fileInputFolder" webkitdirectory directory multiple />
+  <button onclick="uploadFolder()">Upload</button>
+  
+  <h1>Prediction Results</h1>
+  <div id="prediction-container"></div>
 </body>
 
 <script>
-  var socket = io();
+  const socket = io();
+  socket.on('connect', (s) => {
+    console.log('Connected to server', socket.id);
+
+  });
+  const sendPrediction = 'sendPrediction';
+  const receivePrediction = 'receivePrediction';
+  socket.on(receivePrediction, (data) => {
+    console.log(data)
+    document.getElementById('prediction-container').innerHTML += '<div><b>' + data.name + '</b>: ' + data.prediction + '</div>'
+
+  });
+
+
   function uploadFile() {
-    const fileInput = document.getElementById('fileInput');
-    const validExtensions = ['.pdf','.dcm', '.jpg', '.png']; // Add your desired file extensions
-    for(let i = 0; i < fileInput.files.length; i++) {
-        console.log(fileInput.files[i].webkitRelativePath);
+    const fileInput = document.getElementById('fileInputFile');
+    const validExtensions = ['.pdf', '.dcm', '.jpg', '.png']; // Add your desired file extensions
+    for (let i = 0; i < fileInput.files.length; i++) {
+      console.log(fileInput.files[i].name);
+    }
+    for (const file of fileInput.files) {
+      if (validExtensions.some(extension => file.name.toLowerCase().endsWith(extension))) {
+        console.log(file);
+
+        const filename = file.name;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const fileData = e.target.result;
+          socket.emit("sendToServer", { 'file': fileData, 'filename': filename });
+        };
+        reader.readAsArrayBuffer(file);
+      } else {
+        console.log('Skipping file with invalid extension:', file.name);
+      }
+    }
+  };
+
+  function uploadFiles() {
+    const fileInput = document.getElementById('fileInputFiles');
+    const validExtensions = ['.pdf', '.dcm', '.jpg', '.png']; // Add your desired file extensions
+    for (let i = 0; i < fileInput.files.length; i++) {
+      console.log(fileInput.files[i].name);
+    }
+    for (const file of fileInput.files) {
+      if (validExtensions.some(extension => file.name.toLowerCase().endsWith(extension))) {
+        console.log(file);
+
+        const filename = file.name;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const fileData = e.target.result;
+          socket.emit("sendToServer", { 'file': fileData, 'filename': filename });
+        };
+        reader.readAsArrayBuffer(file);
+      } else {
+        console.log('Skipping file with invalid extension:', file.name);
+      }
+    }
+  };
+
+  function uploadFolder() {
+    const fileInput = document.getElementById('fileInputFolder');
+    const validExtensions = ['.pdf', '.dcm', '.jpg', '.png']; // Add your desired file extensions
+    for (let i = 0; i < fileInput.files.length; i++) {
+      console.log(fileInput.files[i].webkitRelativePath);
     }
     for (const file of fileInput.files) {
       if (validExtensions.some(extension => file.name.toLowerCase().endsWith(extension))) {
@@ -36,7 +108,8 @@
         console.log('Skipping file with invalid extension:', file.name);
       }
     }
-  }
+  };
+
 
 
 </script>
