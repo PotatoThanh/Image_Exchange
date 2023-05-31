@@ -1,28 +1,41 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Hello world</title>
-  </head>
-  <script src="/socket.io/socket.io.js"></script>
-  
-  <body>
-    <input type="file" id="fileInput" />
-  </body>
 
-  <script>
-    var socket = io();
+<head>
+  <title>File Upload with Socket.IO</title>
+</head>
+<script src="/socket.io/socket.io.js"></script>
+
+<body>
+  <input type="file" id="fileInput" multiple />
+  <button onclick="uploadFile()">Upload</button>
+</body>
+
+<script>
+  var socket = io();
+  function uploadFile() {
     const fileInput = document.getElementById('fileInput');
-    fileInput.addEventListener("change", (event) => {
-      const file = event.target.files[0];
-      const filename = file.name;
+    const validExtensions = ['.pdf','.dcm', '.jpg', '.png']; // Add your desired file extensions
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const fileData = e.target.result;
-        socket.emit("upload", { file: fileData, filename: filename });
-      };
-      reader.readAsArrayBuffer(file);
-    });
-  </script>
+    for (const file of fileInput.files) {
+      if (validExtensions.some(extension => file.name.toLowerCase().endsWith(extension))) {
+        console.log(file);
+
+        let filename = file.name;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const fileData = e.target.result;
+          socket.emit("server_upload", { 'file': fileData, 'filename': filename });
+        };
+        reader.readAsArrayBuffer(file);
+      } else {
+        console.log('Skipping file with invalid extension:', file.name);
+      }
+    }
+  }
+
+
+</script>
 
 </html>
