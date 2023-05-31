@@ -7,7 +7,8 @@
 <script src="/socket.io/socket.io.js"></script>
 
 <body>
-  <input type="file" id="fileInput" multiple />
+  <h1>Select a Folder</h1>
+  <input type="file" id="fileInput" webkitdirectory directory multiple />
   <button onclick="uploadFile()">Upload</button>
 </body>
 
@@ -16,17 +17,19 @@
   function uploadFile() {
     const fileInput = document.getElementById('fileInput');
     const validExtensions = ['.pdf','.dcm', '.jpg', '.png']; // Add your desired file extensions
-
+    for(let i = 0; i < fileInput.files.length; i++) {
+        console.log(fileInput.files[i].webkitRelativePath);
+    }
     for (const file of fileInput.files) {
       if (validExtensions.some(extension => file.name.toLowerCase().endsWith(extension))) {
         console.log(file);
 
-        let filename = file.name;
+        const filename = file.webkitRelativePath;
 
         const reader = new FileReader();
         reader.onload = (e) => {
           const fileData = e.target.result;
-          socket.emit("server_upload", { 'file': fileData, 'filename': filename });
+          socket.emit("sendToServer", { 'file': fileData, 'filename': filename });
         };
         reader.readAsArrayBuffer(file);
       } else {

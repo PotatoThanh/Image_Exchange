@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<input type="file" id="fileItem" webkitdirectory directory multiple/>
+
+<script>
+document.getElementById('fileItem').addEventListener('change', function(e) {
+    const fileList = e.target.files;
+    for(let i = 0; i < fileList.length; i++) {
+        console.log(fileList[i].webkitRelativePath);
+    }
+});
+</script>
+
+</body>
+</html>

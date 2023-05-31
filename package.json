@@ -6,7 +6,8 @@
   "scripts": {
     "server": "nodemon server.js",
     "aiclient": "nodemon AI_client.js",
-    "client": "nodemon client.js"
+    "client": "nodemon client.js",
+    "gateway": "nodemon gateway.js"
   },
   "keywords": [],
   "author": "",

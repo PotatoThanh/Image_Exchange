@@ -8,26 +8,29 @@ var io = require("socket.io")(http, {
     },
 });
 const fs = require('fs');
+const path = require('path');
+
+const fileUtils = require('./utils/file_utils.js')
+const serverStore = 'store_server'
+const channel = 'sendToServer'
+
+fs.mkdirSync(serverStore, { recursive: true });
 
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/index.html');
+    res.sendFile(path.join(__dirname,'index.html'));
 });
 
 io.on('connection', (socket) => {
     console.log('A user connected', socket.id);
-    socket.on("server_upload", (file, callback) => {
-        let filename = file.filename;
+    socket.on(channel, (file, callback) => {
+        const filename = file.filename;
 
         // save the content to the disk, for example
-        var filePath = `./server_upload/${filename}`;
-        fs.writeFile(filePath, file.file, (err) => {
-            if (err) {
-                console.log('An error occurred while writing the file', err);
-            }
-            else {
-                console.log('File has been saved', filename);
-            }
-        });
+        var filePath = path.join(serverStore, filename);
+        console.log(`filePath ${filePath}`);
+        const createfolders = fileUtils.createFolderAndSubfolders(filePath)
+
+        fileUtils.writeMyFile(filePath, file.file, "SERVER_WRITE")
 
     });
 
@@ -35,26 +38,22 @@ io.on('connection', (socket) => {
     // Periodically emit an event to the client every 4 seconds
     var sent = []
     const intervalId = setInterval(() => {
-        var folderPath = './server_upload'
-        fs.readdir(folderPath, (err, filenames) => {
-            if (err) {
-                console.error('Error reading folder:', err);
-                return;
-            }
+        // Get all files in the subfolder
+        const filenames = fileUtils.getAllFilesInSubfolder(serverStore);
 
-            // console.log('Filenames in the folder:', filenames);
-            var nonOverlappingElements = filenames.filter(function (element) {
-                return !sent.includes(element);
-            });
-
-            sent.push(...nonOverlappingElements);
-            if (nonOverlappingElements.length > 0) {
-                send_to_client(filenames, socket, "client_upload");
-                send_to_client(filenames, socket, "ai_client_upload");
-            }
+        // console.log('Filenames in the folder:', filenames);
+        var nonOverlappingElements = filenames.filter(function (element) {
+            return !sent.includes(element);
         });
 
-    }, 2000);
+        sent.push(...nonOverlappingElements);
+        if (nonOverlappingElements.length > 0) {
+            fileUtils.sendToDestination(filenames, socket, "sendToClient");
+            fileUtils.sendToDestination(filenames, socket, "sendToAIClient");
+        }
+
+
+    }, 4000);
 
     // Handle client disconnection
     socket.on('disconnect', () => {
@@ -66,22 +65,7 @@ io.on('connection', (socket) => {
 
 });
 
-function send_to_client(filenames, socket, channel) {
-    // send files to clients
-    for (var i = 0; i < filenames.length; i++) {
-        let filename = filenames[i]
-        let filePath = `./server_upload/${filename}`;
-        console.log(`Send to ${channel}:`, filePath)
-        fs.readFile(filePath, (err, data) => {
-            if (err) {
-                console.log('Error reading file: ', err);
-            }
 
-            // Send the buffer to server
-            socket.emit(channel, { 'filename': filename, 'file': data });
-        });
-    };
-};
 http.listen(3000, () => {
     console.log('listening on localhost:3000');
 });
