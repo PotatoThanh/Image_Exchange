@@ -6,5 +6,6 @@ store_server/*
 storeDCM/*
 node_modules/*
 Rec_PACS/*
+REV_PACS/*
 store_AIclient/*
 AI_App/examples/*

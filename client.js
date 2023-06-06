@@ -30,9 +30,9 @@ socket.on(channel, (file, callback) => {
 // Periodically emit an event to the client every 4 seconds
 var sent = []
 const intervalId = setInterval(() => {
-    const ip = "192.168.192.239";
+    const ip = "localhost";
     const port = "11113";
-    const aet = "REC_PACS"
+    const aet = "REV_PACS"
     // storescp -aet REC_PACS -od Rec_PACS -v --fork -su '' 11113/192.168.192.239
     // Get all files in the subfolder
     const filenames = fileUtils.getAllFilesInSubfolder(clientStore);

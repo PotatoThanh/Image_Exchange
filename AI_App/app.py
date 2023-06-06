@@ -42,4 +42,4 @@ def predict():
 
 
 if __name__ == '__main__':
-    app.run('192.168.192.239', 5000)
+    app.run('localhost', 5000)

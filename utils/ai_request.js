@@ -9,7 +9,7 @@ async function sendReqImage(filePath) {
     form_data.append('file', fs.createReadStream(filePath));
 
     try {
-        const response = await axios.post('http://192.168.192.239:5000/predict', form_data, {
+        const response = await axios.post('http://localhost:5000/predict', form_data, {
             headers: {
                 ...form_data.getHeaders()
             }
