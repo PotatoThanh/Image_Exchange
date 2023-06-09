@@ -77,5 +77,39 @@ function runStorescu(ip, port, pathFile, aet) {
     return storescuProcess;
 }
 
+// Function to run the findscu command
+function runFindscu(patient, ip, port, aec) {
+    
+    //"storescu {} {} {} +sd -aet {}".format(PACs_IP, PACs_PORT, os.path.join(FTP_Receiver, i[0]), PACs_AET)
+    // Set the command to execute storescu
+    const command = `findscu -v -P -k 0008,0052="PATIENT" -k 0010,0010="${patient}" -k 0010,0030="*" -k 0008,0060="*" -k 0008,1030="*" -aec ${aec} ${ip} ${port}`;
+
+    // Execute the storescp command
+    const storescuProcess = exec(command);
+
+    // Handle process events (optional)
+    var outputs = ''
+    storescuProcess.stdout.on('data', (data) => {
+        outputs = outputs + data
+        console.log(`stdout: ${data}`);
+    });
+
+    storescuProcess.stderr.on('data', (data) => {
+        console.error(`stderr: ${data}`);
+    });
+
+    storescuProcess.on('close', (code) => {
+        console.log(`storescu process exited with code ${code}`);
+    });
+
+    storescuProcess.on('error', (err) => {
+        console.error('storescu process error:', err);
+    });
+
+    // Return the storescp process instance (optional)
+    return outputs;
+}
+
 module.exports.runStorescp = runStorescp;
 module.exports.runStorescu = runStorescu;
+module.exports.runFindscu = runFindscu;

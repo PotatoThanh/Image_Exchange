@@ -34,10 +34,28 @@ io.on('connection', (socket) => {
 
     });
 
+    socket.on('search', (msg, callback) => {
+        const patientName = msg.search;
+        console.log(patientName)
+        io.sockets.emit('gate_findscu', patientName);
+        io.sockets.emit('hospital_findscu', patientName);
+
+    });
+    socket.on('hospital_findscu_results', (data) => {
+        console.log('hospital_findscu_results', data)
+        io.sockets.emit('hospital-search', data);
+
+    });
+    socket.on('gate_findscu_results', (data) => {
+        console.log('gate_findscu_results',data)
+        io.sockets.emit('gate-search', data);
+
+    });
+
     const sendPrediction = 'sendPrediction';
     const receivePrediction = 'receivePrediction';
     socket.on(sendPrediction, (data) => {
-        console.log(data)
+        // console.log(data)
         //Send predictions
         io.sockets.emit(receivePrediction, data);
     });

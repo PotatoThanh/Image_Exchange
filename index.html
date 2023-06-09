@@ -10,17 +10,28 @@
   <h1>Select a File</h1>
   <input type="file" id="fileInputFile" />
   <button onclick="uploadFile()">Upload</button>
-  
+
   <h1>Select Multiple Files</h1>
   <input type="file" id="fileInputFiles" multiple />
   <button onclick="uploadFiles()">Upload</button>
-  
+
   <h1>Select a Folder</h1>
   <input type="file" id="fileInputFolder" webkitdirectory directory multiple />
   <button onclick="uploadFolder()">Upload</button>
-  
+  <hr>
+
   <h1>Prediction Results</h1>
   <div id="prediction-container"></div>
+  <hr>
+
+  <h1>Search on PACs</h1>
+  <input type="text" id="search">
+  <button type="button" name="button" onclick="sendSearch()">Search</button>
+
+  <h2>Gateway</h2>
+  <div id="gate-search-container"></div>
+  <h2>Hospital PACs</h2>
+  <div id="hospital-message-container"></div>
 </body>
 
 <script>
@@ -40,6 +51,7 @@
 
   function uploadFile() {
     const fileInput = document.getElementById('fileInputFile');
+    document.getElementById('prediction-container').innerHTML = ''
     const validExtensions = ['.pdf', '.dcm', '.jpg', '.png']; // Add your desired file extensions
     for (let i = 0; i < fileInput.files.length; i++) {
       console.log(fileInput.files[i].name);
@@ -64,6 +76,7 @@
 
   function uploadFiles() {
     const fileInput = document.getElementById('fileInputFiles');
+    document.getElementById('prediction-container').innerHTML = ''
     const validExtensions = ['.pdf', '.dcm', '.jpg', '.png']; // Add your desired file extensions
     for (let i = 0; i < fileInput.files.length; i++) {
       console.log(fileInput.files[i].name);
@@ -88,6 +101,7 @@
 
   function uploadFolder() {
     const fileInput = document.getElementById('fileInputFolder');
+    document.getElementById('prediction-container').innerHTML = ''
     const validExtensions = ['.pdf', '.dcm', '.jpg', '.png']; // Add your desired file extensions
     for (let i = 0; i < fileInput.files.length; i++) {
       console.log(fileInput.files[i].webkitRelativePath);
@@ -109,6 +123,25 @@
       }
     }
   };
+
+  function sendSearch() {
+    var msg = document.getElementById('search').value;
+    if (msg) {
+      document.getElementById('gate-search-container').innerHTML = '';
+      document.getElementById('hospital-message-container').innerHTML = '';
+      socket.emit('search', { search: msg});
+    }
+  }
+  socket.on('gate-search', function (data) {
+    
+    document.getElementById('gate-search-container').innerHTML += '<div> Name: ' + data.name + '-- DOB:' + data.dob + '</div>'
+    
+  })
+  socket.on('hospital-search', function (data) {
+    console.log(data)  
+    document.getElementById('hospital-message-container').innerHTML += '<div> Name: ' + data.name + '-- DOB:' + data.dob + '</div>'
+    
+  })
 
 
 

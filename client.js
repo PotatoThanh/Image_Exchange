@@ -31,7 +31,7 @@ socket.on(channel, (file, callback) => {
 var sent = []
 const intervalId = setInterval(() => {
     const ip = "localhost";
-    const port = "11113";
+    const port = "11119";
     const aet = "REV_PACS"
     // storescp -aet REC_PACS -od Rec_PACS -v --fork -su '' 11113/192.168.192.239
     // Get all files in the subfolder
